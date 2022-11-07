@@ -6,7 +6,7 @@ import "../node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol";
 // using standard ERC20 ,only overriding some part
 contract Matic is ERC20 {
     //MATIC-->custom symbol // LokiMatic-->custon name
-  constructor() ERC20('MATIC', 'LokiMatic') {
+  constructor() ERC20('MATIC', 'Polygon') {
     //when this is minted the owner gets the 5thiusand these token 
     _mint(msg.sender, 5000 * 10**18);
   }

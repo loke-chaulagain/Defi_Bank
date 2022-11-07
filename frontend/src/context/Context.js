@@ -1,8 +1,48 @@
 import { useEffect, useState, createContext } from "react";
+import { bankContractAddress, usdtAbi, shibAbi, maticAbi, bankAbi } from "../utils/constants";
 
 export const BankContext = createContext();
 
 export const BankContextProvider = ({ children }) => {
+  const [provider, setProvider] = useState(undefined);
+  const [signer, setSigner] = useState(undefined);
+  const [signerAddress, setSignerAddress] = useState(undefined);
+  const [bankContract, setBankContract] = useState(undefined);
+  const [tokenContracts, setTokenContracts] = useState({});
+  const [tokenBalances, setTokenBalances] = useState({});
+  const [tokenSymbols, setTokenSymbols] = useState([]);
+
+  const [amount, setAmount] = useState(0);
+  const [selectedSymbol, setSelectedSymbol] = useState(undefined);
+  const [isDeposit, setIsDeposit] = useState(true);
+
+  // Helper function
+  const toBytes32 = (text) => ethers.utils.formatBytes32String(text);
+  const toString = (bytes32) => ethers.utils.parseBytes32String(bytes32);
+  const toWei = (ether) => ethers.utils.parseEther(ether);
+  const toEther = (wei) => ethers.utils.formatEther(wei).toString();
+  const toRound = (num) => Number(num).toFixed(2);
+
+  useEffect(() => {
+    const init = async () => {
+      const provider = await new ethers.providers.Web3Provider(window.ethereum);
+      setProvider(provider);
+
+      const bankContract = await new ethers.Contract(bankContractAddress, bankAbi);
+      setBankContract(bankContract);
+
+      bankContract
+        .connect(provider)
+        .getWhitelistedSymbols()
+        .then((result) => {
+          const symbols = result.map((s) => toString(s));
+          setTokenSymbols(symbols);
+          getTokenContracts(symbols, bankContract, provider);
+        });
+    };
+    init();
+  }, []);
+
   const [currentAccount, setCurrentAccount] = useState("");
 
   // This functions runs on every page refresh and gets connected wallet address.

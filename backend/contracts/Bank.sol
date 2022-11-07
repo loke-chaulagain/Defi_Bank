@@ -41,7 +41,7 @@ contract Bank {
         return whitelistedSymbols;
     }
 
-    // get whiteListed token address(token contract address) fron its symbol
+    // get single whiteListed token address(token contract address) from its symbol
     function getWhitelistedTokenAddress(bytes32 symbol)
         external
         view
@@ -81,7 +81,7 @@ contract Bank {
         );
     }
 
-    // withdraw the tokens
+    // withdraw the tokens they have deposited
     function withdrawTokens(uint256 amount, bytes32 symbol) external {
         //check the deposited balance of the user
         require(balances[msg.sender][symbol] >= amount, "Insufficient funds");

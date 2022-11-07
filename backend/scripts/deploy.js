@@ -1,40 +1,50 @@
+const hre = require("hardhat");
+
 async function main() {
-  [signer1, signer2] = await ethers.getSigners();
+  // signer1 is my wallet address who deployed the contract , all tokens will be transferred initially to this address
+  [signer1] = await hre.ethers.getSigners();
 
-  const Bank = await ethers.getContractFactory("Bank", signer1);
+  // this signer2 is my second wallet address hardcoded here 
+  const signer2 = "0x512b1121c0985DD40ecAddAc48e66f41373a6648";
+
+  // deploy bank contract
+  const Bank = await hre.ethers.getContractFactory("Bank", signer1);
   const bankContract = await Bank.deploy();
+  await bankContract.deployed();
+  console.log(`Bank contract deployed to ${bankContract.address} by ${signer1.address}`);
 
-  const Matic = await ethers.getContractFactory("Matic", signer2);
+  // deploy matic contract
+  const Matic = await hre.ethers.getContractFactory("Matic", signer2);
   const matic = await Matic.deploy();
+  await matic.deployed();
+  console.log(`Matic contract deployed to ${matic.address} by ${signer2}`);
 
-  const Shib = await ethers.getContractFactory("Shib", signer2);
+  // deploy Shib contract
+  const Shib = await hre.ethers.getContractFactory("Shib", signer2);
   const shib = await Shib.deploy();
+  await shib.deployed();
+  console.log(`Shib contract deployed to ${shib.address} by ${signer2}`);
 
-  const Usdt = await ethers.getContractFactory("Usdt", signer2);
+  // deploy usdc contract
+  const Usdt = await hre.ethers.getContractFactory("Usdt", signer2);
   const usdt = await Usdt.deploy();
+  await usdt.deployed();
+  console.log(`Usdt contract deployed to ${usdt.address} by ${signer2}`);
 
-  // whitelist these three tokens
-  await bankContract.whitelistToken(
-    ethers.utils.formatBytes32String('Matic'),
-    matic.address
-  );
-  await bankContract.whitelistToken(
-    ethers.utils.formatBytes32String('Shib'),
-    shib.address
-  );
-  await bankContract.whitelistToken(
-    ethers.utils.formatBytes32String('Usdt'),
-    usdt.address
-  );
-  await bankContract.whitelistToken(
-    ethers.utils.formatBytes32String('Eth'),
-    '0x83BF08D796ccbE791a3499b93E8cEec588081Abf' //random address
-  );
+  // whiteList the three tokens while deploying using whitelistToken function
+  // this function takes symbol and tokenAddress
 
-  console.log("Bank deployed to:", bankContract.address, "by", signer1.address);
-  console.log("Matic deployed to:", matic.address, "by", signer2.address);
-  console.log("Shib deployed to:", shib.address, "by", signer2.address);
-  console.log("Tether deployed to:", usdt.address, "by", signer2.address);
+  // WhiteList the MAtic tokens whitelistToken function
+  await bankContract.whitelistToken(ethers.utils.formatBytes32String("Matic"), matic.address);
+
+  // WhiteList the Shib tokens whitelistToken function
+  await bankContract.whitelistToken(ethers.utils.formatBytes32String("Shib"), shib.address);
+
+  // WhiteList the usdt tokens whitelistToken function
+  await bankContract.whitelistToken(ethers.utils.formatBytes32String("Usdt"), usdt.address);
+
+  // WhiteList the Eth tokens whitelistToken function using generated random address
+  await bankContract.whitelistToken(ethers.utils.formatBytes32String("Eth"), "0x09B5DC75789389d1627879bA194874F459364859");
 }
 
 main()
